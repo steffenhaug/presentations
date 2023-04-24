@@ -1,0 +1,70 @@
+; julia> @code_native syntax=:intel dot(V, W)
+julia_dot_95:                           # @julia_dot_95
+	mov	rax, qword ptr [rdi + 8]
+	test	rax, rax
+	je	.LBB0_1
+	mov	rcx, qword ptr [rdi]
+	mov	rdx, qword ptr [rsi]
+	cmp	rax, 16
+	jae	.LBB0_4
+	vxorpd	xmm0, xmm0, xmm0
+	xor	esi, esi
+	jmp	.LBB0_7
+.LBB0_1:
+	vxorps	xmm0, xmm0, xmm0
+	ret
+.LBB0_4:                                # %vector.ph
+	mov	rsi, rax
+	and	rsi, -16
+	vxorpd	xmm0, xmm0, xmm0
+	xor	edi, edi
+	vxorpd	xmm1, xmm1, xmm1
+	vxorpd	xmm2, xmm2, xmm2
+	vxorpd	xmm3, xmm3, xmm3
+.LBB0_5:                                # %vector.body
+	vmovups	xmm4, xmmword ptr [rcx + 8*rdi]
+	vmovups	xmm5, xmmword ptr [rcx + 8*rdi + 32]
+	vmovups	xmm6, xmmword ptr [rcx + 8*rdi + 64]
+	vmovups	xmm7, xmmword ptr [rcx + 8*rdi + 96]
+	vinsertf128	ymm4, ymm4, xmmword ptr [rcx + 8*rdi + 16], 1
+	vinsertf128	ymm5, ymm5, xmmword ptr [rcx + 8*rdi + 48], 1
+	vinsertf128	ymm6, ymm6, xmmword ptr [rcx + 8*rdi + 80], 1
+	vinsertf128	ymm7, ymm7, xmmword ptr [rcx + 8*rdi + 112], 1
+	vmovups	xmm8, xmmword ptr [rdx + 8*rdi]
+	vmovups	xmm9, xmmword ptr [rdx + 8*rdi + 32]
+	vmovups	xmm10, xmmword ptr [rdx + 8*rdi + 64]
+	vmovups	xmm11, xmmword ptr [rdx + 8*rdi + 96]
+	vinsertf128	ymm8, ymm8, xmmword ptr [rdx + 8*rdi + 16], 1
+	vmulpd	ymm4, ymm8, ymm4
+	vaddpd	ymm0, ymm0, ymm4
+	vinsertf128	ymm4, ymm9, xmmword ptr [rdx + 8*rdi + 48], 1
+	vmulpd	ymm4, ymm5, ymm4
+	vaddpd	ymm1, ymm1, ymm4
+	vinsertf128	ymm4, ymm10, xmmword ptr [rdx + 8*rdi + 80], 1
+	vmulpd	ymm4, ymm6, ymm4
+	vaddpd	ymm2, ymm2, ymm4
+	vinsertf128	ymm4, ymm11, xmmword ptr [rdx + 8*rdi + 112], 1
+	vmulpd	ymm4, ymm7, ymm4
+	vaddpd	ymm3, ymm3, ymm4
+	add	rdi, 16
+	cmp	rsi, rdi
+	jne	.LBB0_5
+	vaddpd	ymm0, ymm1, ymm0
+	vaddpd	ymm0, ymm2, ymm0
+	vaddpd	ymm0, ymm3, ymm0
+	vextractf128	xmm1, ymm0, 1
+	vaddpd	xmm0, xmm0, xmm1
+	vpermilpd	xmm1, xmm0, 1           # xmm1 = xmm0[1,0]
+	vaddsd	xmm0, xmm0, xmm1
+	cmp	rax, rsi
+	je	.LBB0_8
+.LBB0_7:                                # %L14
+	vmovsd	xmm1, qword ptr [rcx + 8*rsi]   # xmm1 = mem[0],zero
+	vmulsd	xmm1, xmm1, qword ptr [rdx + 8*rsi]
+	vaddsd	xmm0, xmm0, xmm1
+	inc	rsi
+	cmp	rax, rsi
+	jne	.LBB0_7
+.LBB0_8:                                # %L33
+	vzeroupper
+	ret

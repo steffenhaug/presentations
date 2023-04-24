@@ -1,0 +1,9 @@
+name = "JlDemo"
+uuid = "8c95f43a-e761-45a8-abba-b1d3dad710ca"
+authors = ["Steffen <stehau@pm.me>"]
+version = "0.1.0"
+
+[deps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+LoopVectorization = "bdcacae8-1622-11e9-2a5c-532679323890"

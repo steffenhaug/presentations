@@ -1,0 +1,622 @@
+\PassOptionsToPackage{dvipsnames}{xcolor}
+\documentclass[14pt]{beamer}
+\usepackage[]{xcolor}
+\def\MyGreen{ForestGreen}
+\def\MyRed{Red}
+\def\MyOrange{BurntOrange}
+\def\MyBlue{NavyBlue}
+\definecolor{SuperLightGray}{rgb}{0.9,0.9,0.9}
+
+\usepackage[]{svg}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{emoji}
+\usepackage{xfrac}
+\usepackage{cancel}
+\usepackage{csquotes}
+
+\usepackage{fontspec}
+\setmonofont{JetBrainsMono}[
+    Path=./fonts/JetBrainsMono/,
+    Scale=0.7,
+    Extension = .otf,
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic,
+    Numbers=SlashedZero,
+]
+
+
+\usepackage{minted}
+\usemintedstyle{bw}
+\setminted{%
+    autogobble=true,
+    fontsize=\footnotesize,
+    bgcolor=SuperLightGray,
+    tabsize=2,
+}
+
+
+\usepackage{calc}
+
+% This lets us \includestandalone tikz pictures in standalone documents.
+\usepackage{tikz}
+\usetikzlibrary{tikzmark}
+\usetikzlibrary{decorations.pathreplacing,calligraphy,backgrounds}
+\usetikzlibrary{calc}
+\usepackage[mode=buildnew]{standalone}
+\usepackage{xifthen}
+
+\makeatother
+\renewcommand{\thefootnote}{
+    \ifcase\value{footnote}
+        \or*
+        \or**
+        \or***
+        \or****
+    \fi}
+\makeatletter
+
+\usefonttheme{serif}
+\setbeamertemplate{navigation symbols}{}%remove navigation symbols
+
+\setbeamerfont{title}{shape=\sc}
+\setbeamerfont{frametitle}{shape=\sc}
+
+\setbeamercolor{title}{fg=black}
+\setbeamercolor{frametitle}{fg=black}
+
+\setbeamercolor{enumerate item}{fg=gray}
+\setbeamerfont{enumerate item}{shape=\bf}
+
+\newcommand{\Seq}[1]{\left\{ {#1} \right\}}
+\newcommand{\Exp}[1]{e^{#1}}
+
+\title{Julia: From multicore to GPU parallelism}
+\author{\scriptsize\color{gray}
+    presented by Steffen Haug}
+\date{}
+
+\begin{document}
+
+%%
+\begin{frame}
+\titlepage
+\end{frame}
+
+%%
+\begin{frame}
+\centering
+\textsc{What is Julia?}\\{\scriptsize(Briefly)}
+\end{frame}
+
+%%
+\begin{frame}
+    \centering
+    {
+        {
+            \begin{minipage}[c][.9\textheight][c]{.65\textwidth}
+                \raggedright\scriptsize
+                \begin{enumerate}
+                    \item High level programming language
+                    \onslide<2- >{\item Dynamically typed}
+                    \onslide<3- >{\item For HPC}
+                    \onslide<4- >{\item \bf Novel compilation
+                        infrastructure\\
+                        {\color{gray}(Central on CPU and GPU)}}
+                \end{enumerate}
+                \vspace*{2em}
+                \centering
+                \onslide<4- >{
+                    Untyped AST specialized at
+                    runtime\\[1em]
+                }
+                \onslide<5- >{
+                    {\em ``Looks like Python -- runs like
+                    Fortran''}
+                }
+            \end{minipage}
+        }
+        \hspace*{\fill}
+        {
+            \begin{minipage}[c][.9\textheight][c]{.2\textwidth}
+                \includesvg[width=\textwidth]{jllogo}
+            \end{minipage}
+        }
+    }
+\end{frame}
+
+%%
+\begin{frame}
+    \centering
+    \begin{minipage}[c][.9\textheight][t]{\textwidth}
+        \centering
+        \textsc{Example}
+        \inputminted{julia}{mints/square.jl}
+        \scriptsize
+        \vfill
+        \only<1>{Function that squares (mutates) a vector.}
+        \only<2>{Not a type in sight!}
+        \only<3>{When invoked with \mintinline{julia}{V},
+            \mintinline{julia}{square!} is specialized to
+            \mintinline{julia}{Vector{Float64}}.
+        }
+        \only<4>{
+            \mintinline{julia}{@code_native} is a ``macro''
+            that allows us to inspect code generated for a
+            particular specialization.
+        }
+        \only<5>{
+            {\bf Simple function} -- surely the assembly code is
+            reasonably simple? \includegraphics{copium}
+        }
+    \end{minipage}
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \scalebox{0.2}{
+        {
+            \begin{minipage}[c][5\textheight][c]{2\textwidth}
+                \inputminted[tabsize=2]{text}{mints/square.asm}
+            \end{minipage}
+        }
+    }%
+    {
+            \begin{minipage}[c][.95\textheight][c]{.2\textwidth}
+                \centering
+                \Large
+                \emoji{raised-eyebrow}
+                $^{\text{?}}$
+            \end{minipage}
+    }
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \scalebox{0.4}{
+        {
+            \begin{minipage}[c][2.4\textheight][c]{1.5\textwidth}
+                \inputminted[tabsize=2]{text}{mints/square_cleaned.asm}
+            \end{minipage}
+        }
+    }%
+    {
+            \begin{minipage}[c][.95\textheight][c]{.2\textwidth}
+                \centering
+                \Large
+                \emoji{raised-eyebrow}\\[1em]
+                \scriptsize
+                Remove some comments...
+            \end{minipage}
+    }
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \scalebox{0.6}{
+        {
+            \begin{minipage}[c][1.1\textheight][t]{1.5\textwidth}
+                \inputminted[
+                    tabsize=2,
+                    firstline=13,
+                    lastline=36
+                ]{text}{mints/square_cleaned.asm}
+            \end{minipage}
+        }
+    }\\
+    {
+        \begin{minipage}[c][.2\textheight][c]{\textwidth}
+            \centering\scriptsize
+            Julia has {\color{\MyOrange}unrolled the loop}
+            and used {\color{\MyOrange}SIMD-instructions}!
+        \end{minipage}
+    }
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \scalebox{0.6}{
+        {
+            \begin{minipage}[c][1.1\textheight][t]{1.5\textwidth}
+                \inputminted{c}{mints/square.c}\\
+                \vspace{-3em}
+                \inputminted[
+                    tabsize=2,
+                ]{text}{mints/square_c.asm}
+            \end{minipage}
+        }
+    }\\
+    {
+        \begin{minipage}[c][.2\textheight][c]{\textwidth}
+            \centering\scriptsize
+            This is what Clang does.\\
+            {\color{gray}({\em Slightly} better due to
+            Julia-arrays being strided)}
+        \end{minipage}
+    }
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    {
+    \begin{minipage}[c][.9\textheight][t]{\textwidth}
+        \centering
+        \textsc{Julia uses LLVM}\\[1em]
+        \includegraphics[width=.5\textwidth]{LLVM_logo}\\[1em]
+        \scriptsize
+        Julia can do the same optimizations we
+        expect in C/C++\\
+        \vspace*{\fill}
+        \pause
+        {\em ...because it is literally the same optimizer!}
+    \end{minipage}
+    }
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    {
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+        \textsc{
+            But there are some \underline{huge} caveats}\\[1em]
+        
+        \raggedright\scriptsize
+        \begin{enumerate}
+            \item \onslide<1- >{
+                    There is some {\em slight} compilation overhead
+                    at startup
+                }
+            \item \onslide<2- >{
+                    Julia is {\em garbage-collected}
+                    \emoji{face-vomiting}
+                }
+            \item \onslide<3- >{
+                    We have no explicit control over memory \\
+                    {\color{gray}(Allocation, copying, ...)}
+                }
+            \item \onslide<4- >{
+                    {\em The whole thing breaks} if Julia can't
+                    figure out the types
+                }
+        \end{enumerate}
+        \centering
+        \vfill
+        \only<1>{
+            \color{gray}However: As problem size grows, relative
+            compilation time decreases.
+        }
+        \only<3>{
+            Accidental heap operations can really hurt!
+        }
+        \only<4>{
+            There are many ways to shoot yourself
+            in the foot! \emoji{slightly-smiling-face}
+        }
+    \end{minipage}
+    }
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    {
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+        {
+            \scalebox{.6}{
+                \begin{minipage}[c][.8\textheight][c]{.7\textwidth}
+                    \centering
+                    \inputminted[
+                        tabsize=2,
+                    ]{julia}{mints/quad_noconst.jl}\\[-.5em]
+                    \vfill
+                    \small
+                    \onslide<2- >{
+                        0.010550 seconds
+
+                        (499.49 k allocations)
+                    }
+                \end{minipage}
+            }
+        }\hspace*{\fill}
+        {
+            \scalebox{.6}{
+                \begin{minipage}[c][.8\textheight][c]{.7\textwidth}
+                    \centering
+                    \inputminted[
+                        tabsize=2,
+                    ]{julia}{mints/quad_const.jl}\\[-.5em]
+                    \vfill
+                    \small
+                    \onslide<2- >{
+                        0.000175 seconds
+
+                        \phantom{(xd)}
+                    }
+                \end{minipage}
+            }
+        }\\[1em]
+        
+        \scriptsize
+        \only<1>{Two seemingly quite similar programs...}
+        \only<2>{One is $\sim\!60 \times$ faster than the other!}
+        \only<3- >{And 500K allocations? \emoji{exploding-head}}
+        \vfill
+        \only<4>{
+            \mintinline{julia}{Δx} could be reassigned
+            $\implies$ Julia can't assume its type!
+        }
+        \only<5>{
+            Leads to runtime type checks and dynamic
+            dispatching...
+        }
+        \only<6- >{
+            ...and forces intermediate calculations onto the
+            heap!
+        }
+
+        \onslide<7>{
+            \includegraphics{despairge}
+        }
+    \end{minipage}
+    }
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering\scriptsize
+    Julia {\em can} generate really fast code...\\[1em]
+    
+    \pause
+    But the {\em \color{orange}lack of explicit control} 
+        requires a lot of attention.\\[4em]
+
+    \pause
+    Even more so when we
+    {\color{\MyBlue}parallelize} our programs.
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \textsc{Multicore}\\[1em]
+
+    \mintinline{julia}{using .Threads: @threads}
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    {
+    \begin{minipage}[c][.8\textheight][c]{\textwidth}
+        \centering
+        {
+            \scalebox{.6}{
+                \begin{minipage}[c][.2\textheight][c]{.6\textwidth}
+                    \centering
+                    \inputminted[
+                        tabsize=2,
+                    ]{julia}{mints/nothreads.jl}
+                \end{minipage}
+            }
+        } $\longrightarrow$
+        {
+            \scalebox{.6}{
+                \begin{minipage}[c][.2\textheight][c]{.6\textwidth}
+                    \centering
+                    \inputminted[
+                        tabsize=2,
+                        firstline=3,
+                    ]{julia}{mints/threads.jl}
+                \end{minipage}
+            }
+        }
+        \scriptsize
+        Similar API to OpenMP: {\em Just annotate loops with a
+        macro.}\\[2em]
+
+        \pause
+        \textsc{The normal caveats apply}
+        \begin{enumerate}
+            \item Spawning threads involve some overhead
+            \item \pause Memory is shared (Race conditions,
+                deadlocks)
+            \item \pause Possible speedup severely limited
+                by core count
+            \item \pause Domain decomposition sometimes
+                necessary to get speedup on simple problems
+        \end{enumerate}
+    \end{minipage}
+    }
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \textsc{GPU Parallelism}\\
+    \includegraphics[width=.3\textwidth]{gpulogo}
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \textsc{Level 1: ``Vectorized'' Array API}\\
+    {\scriptsize\color{gray}(Vectorized in the sense that
+    you only operate on arrays, Numpy style)}
+\end{frame}
+
+%%
+\begin{frame}
+    \centering
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+        \textsc{``Vectorized'' Array API}\\[1em]
+        \inputminted[
+            firstline=3,
+            lastline=11,
+        ]{julia}{mints/cuvecapi.jl}
+
+        \vfill
+        \scriptsize
+        \only<1>{
+            \mintinline{julia}{v},
+            \mintinline{julia}{w} of type
+            \mintinline{julia}{CuArray} that manages a
+            device-side buffer.
+        }
+        \only<2>{
+            Block- and gridsizes automatically determined.
+        }
+    \end{minipage}
+\end{frame}
+
+%%
+\begin{frame}
+    \centering
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+        \textsc{``Vectorized'' Array API}\\[1em]
+        \inputminted[
+            firstline=13,
+            lastline=21,
+        ]{julia}{mints/cuvecapi.jl}%
+
+        \vfill
+        \scriptsize
+        \only<1>{
+            Bindings to CUDA libraries like cuFFT and cuBLAS\\
+            {\color{gray} (Also cuSPARSE, cuSOLVER, ...)}
+        }
+        \only<2>{
+            GPU code generated on the fly using LLVMs
+            PTX/SASS backend...\\
+            {\color{gray} (Same sort of infrastructure as
+            specializing Julia functions)}
+        }
+        \only<3>{
+            Enables kernel fusion and global optimization (!)
+        }
+        \only<4>{
+            Like with CPU code, you can inspect the
+            generated GPU code.\\
+            {\color{gray} (SASS/PTX code is too long/ugly to put on a slide)}
+        }
+    \end{minipage}
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \textsc{Level 2: Julia on the GPU}
+\end{frame}
+
+%%
+\begin{frame}
+    \centering
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+        \textsc{Julia on the GPU}\\[1em]
+        \inputminted[
+            firstline=5,
+        ]{julia}{mints/jlgpu.jl}
+        \vfill\scriptsize
+        \only<1>{
+            \mintinline{julia}{cusquare!}
+            is defined {\em as a regular Julia function}!\\
+            {\color{gray}(It won't run if you call it;
+            block- and thread-ID is not defined on the CPU)}
+        }
+        \only<2>{
+            The \mintinline{julia}{@cuda} macro
+            transforms typed {\color{\MyBlue}Julia IR}
+            into {\color{\MyBlue}GPU code}!\\
+            \emoji{exploding-head}
+        }
+        \only<3>{
+            Basically, almost {\em any} sensible Julia can just work
+            on the GPU\\
+        }
+        \only<4>{
+            {However, there is no escape hatch:}
+            {\em The code must
+            type check, and can't allocate}
+        }
+    \end{minipage}
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \textsc{Level 3: Multi-GPU systems}
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+        \textsc{Level 3: Multi-GPU systems}\\[1em]
+        \scriptsize
+        \mintinline{text}{CUDA.jl} composes with
+        \mintinline{text}{DistributedArrays.jl}\\[1em]
+
+        {\raggedright
+        \mintinline{text}{DistributedArrays.jl}:
+        Domain decomposition and distribution algorithms \\[1em]
+        \mintinline{text}{CUDA.jl}: Manages device-side
+        buffers and host-device communication\\[3em]
+        }
+
+        {\color{\MyBlue}Both understands Julias abstract concept of\\ an
+        ``Array'', so they work together.}
+
+
+        \vfill
+        {\color{gray}{\em Rapid Software Prototyping for
+        Heterogeneous and Distributed Platforms}\\ Besard
+        et. al.}
+    \end{minipage}
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \begin{itemize}
+        \item verdict: you cant escape location location
+            location
+        \item julia has real potential, but it is not a free
+            lunch
+        \item fighting the abstraction
+        \item what niche does julia even fill? if you
+            understand it you dont want it, and if you dont
+            understand it you can't use it
+    \end{itemize}
+\end{frame}
+
+
+\end{document}

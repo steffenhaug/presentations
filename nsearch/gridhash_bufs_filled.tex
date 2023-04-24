@@ -1,0 +1,112 @@
+
+\documentclass{standalone}
+\begin{document}
+\begin{tikzpicture}
+
+\fill[orange] (4, 0) rectangle (5, 1);
+\fill[cyan] (4, 1) rectangle (5, 2);
+\fill[green] (4, 2) rectangle (5, 3);
+\fill[yellow] (4, 3) rectangle (5, 4);
+\fill[teal] (4, 4) rectangle (5, 5);
+
+\draw (1, 0) -- (1, 8);
+\draw (0, 0) -- (0, 8);
+\foreach \i in {0,...,8}
+{
+    \draw (0, \i) -- (1, \i);
+}
+
+\draw (0, 0.5) node[left]{$0$};
+\draw (0, 1.5) node[left]{$1$};
+\draw (0, 2.5) node[left]{$2$};
+\draw (0, 3.5) node[left]{$3$};
+
+\draw (0, 4.5) node[left]{$4$};
+\draw (0, 5.5) node[left]{$5$};
+\draw (0, 6.5) node[left]{$6$};
+\draw (0, 7.5) node[left]{$7$};
+
+\draw (4, 0) -- (4, 5);
+\draw (5, 0) -- (5, 5);
+\foreach \i in {0,...,5}
+{
+    \draw (4, \i) -- (5, \i);
+}
+
+\draw[thick,->,shorten >=2pt] (0.5, 0.5) -- (4.5, 0.5);
+\draw[thick,->,shorten >=2pt] (0.5, 1.5) -- (4.5, 1.5);
+\draw[thick,->,shorten >=2pt] (0.5, 2.5) -- (4.5, 2.5);
+\draw[thick,->,shorten >=2pt] (0.5, 3.5) -- (4.5, 3.5);
+\draw[thick,->,shorten >=2pt] (0.5, 5.5) -- (4.5, 4.5);
+\draw[fill] (0.5, 0.5) circle (1pt);
+\draw[fill] (0.5, 1.5) circle (1pt);
+\draw[fill] (0.5, 2.5) circle (1pt);
+\draw[fill] (0.5, 3.5) circle (1pt);
+\draw[fill] (0.5, 5.5) circle (1pt);
+
+    \draw[dashed] (8, 0) -- (8, 5);
+    \draw[dashed] (12, 0) -- (12, 5);
+\foreach \i in {0,...,5}
+{
+    \draw[dashed] (8, \i) -- (12, \i);
+}
+
+\draw[thick,->,shorten >=2pt] (4.5, 0.5) -- (8, 0.5);
+\draw[thick,->,shorten >=2pt] (4.5, 1.5) -- (8, 1.5);
+\draw[thick,->,shorten >=2pt] (4.5, 2.5) -- (8, 2.5);
+\draw[thick,->,shorten >=2pt] (4.5, 3.5) -- (8, 3.5);
+\draw[thick,->,shorten >=2pt] (4.5, 4.5) -- (8, 4.5);
+\draw[fill] (4.5, 0.5) circle (1pt);
+\draw[fill] (4.5, 1.5) circle (1pt);
+\draw[fill] (4.5, 2.5) circle (1pt);
+\draw[fill] (4.5, 3.5) circle (1pt);
+\draw[fill] (4.5, 4.5) circle (1pt);
+
+\draw (8.5, 0.5) node{$A$};
+\draw (9.5, 0.5) node{$E$};
+\draw (8, 0) -- (10, 0);
+\draw (8, 1) -- (10, 1);
+\foreach \i in {8,10}
+{
+\draw (\i, 0) -- (\i, 1);
+}
+
+\draw (8.5, 1.5) node{$C$};
+\draw (9.5, 1.5) node{$G$};
+\draw (10.5, 1.5) node{$J$};
+\draw (8, 1) -- (11, 1);
+\draw (8, 2) -- (11, 2);
+\foreach \i in {8,11}
+{
+\draw (\i, 1) -- (\i, 2);
+}
+
+\draw (8.5, 2.5) node{$F$};
+\draw (8, 2) -- (9, 2);
+\draw (8, 3) -- (9, 3);
+\foreach \i in {8,9}
+{
+\draw (\i, 2) -- (\i, 3);
+}
+
+\draw (8.5, 3.5) node{$B$};
+\draw (9.5, 3.5) node{$H$};
+\draw (10.5, 3.5) node{$I$};
+\draw (8, 3) -- (11, 3);
+\draw (8, 4) -- (11, 4);
+\foreach \i in {8,11}
+{
+\draw (\i, 3) -- (\i, 4);
+}
+
+\draw (8.5, 4.5) node{$D$};
+\draw (8, 4) -- (9, 4);
+\draw (8, 5) -- (9, 5);
+\foreach \i in {8,9}
+{
+\draw (\i, 4) -- (\i, 5);
+}
+
+
+\end{tikzpicture}
+\end{document}
