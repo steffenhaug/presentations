@@ -570,7 +570,8 @@
 %%
 \begin{frame}
     \centering
-    \textsc{Level 3: Multi-GPU systems}
+    \textsc{Level 3: Multi-GPU systems}\\
+    \scriptsize Future Outlook
 \end{frame}
 
 
@@ -606,17 +607,73 @@
 %%
 \begin{frame}
     \centering
-    \begin{itemize}
-        \item verdict: you cant escape location location
-            location
-        \item julia has real potential, but it is not a free
-            lunch
-        \item fighting the abstraction
-        \item what niche does julia even fill? if you
-            understand it you dont want it, and if you dont
-            understand it you can't use it
-    \end{itemize}
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+        \textsc{in summary}\\[1em]
+
+        \scriptsize
+        Julia makes bold claims%
+        \only<2>{: {\em ``Looks like Python -- runs like}
+        C/C++/Fortran''}%
+        \only<3- >{: {\em ``Only dynamic language to achieve
+        petascale''}}
+
+        \vspace{2em}
+        \only<4>{It is a truth with a \underline{big
+        asterisk}.}
+        \only<5->{
+            If there is {\em one thing} that is true, it is
+            that you can't escape\\[1em]
+            \small \textsc{Location, location, location}
+        }
+
+        \scriptsize
+        \vspace{2em}
+        \only<6>{
+            Julia has {\em real} potential, but it is
+            {\em not a free lunch!}\\
+            {\color{gray}(Especially on the GPU)}
+        }%
+        \only<7>{
+            I spend a lot of time ``fighting the
+            abstraction''
+        }%
+        \only<8->{
+            Allocation, garbage-collection, copies,
+            CUDA device$\leftrightarrow$host transfers,
+            etc.\\
+            are all {\em implicit!}\\[1em]
+        }%
+        \only<9>{
+            As Julia takes away your control, you have to be
+            careful.
+        }%
+        \only<10>{
+            {\color{\MyBlue} The abstraction leaks!}
+        }%
+    \end{minipage}
 \end{frame}
 
+
+%%
+\begin{frame}
+    \centering
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+        \textsc{in summary}\\[1em]
+
+        \scriptsize
+        \only<1-3>{
+            {\em What niche does Julia even fill?}\\[2em]
+        }%
+        \only<2>{
+            If you {\em do understand} memory, you don't want it.
+        }%
+        \only<3>{
+            If you {\em don't understand} memory, you
+            basically can't use it!
+        }%
+    \end{minipage}
+\end{frame}
 
 \end{document}
