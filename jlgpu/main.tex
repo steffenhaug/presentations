@@ -570,7 +570,26 @@
 %%
 \begin{frame}
     \centering
-    \textsc{Level 3: Multi-GPU systems}\\
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+    \textsc{Pitfalls}\\[2em]
+
+    \scriptsize
+    \only<2>{
+        \mintinline{Julia}{CuArray} controls all memory transfer
+    }%
+    \only<3>{
+        Accidentally reading back to the CPU is really
+        painful!
+    }%
+    \end{minipage}
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \textsc{Level 3: Multi-GPU / Multi-node}\\[1em]
     \scriptsize Future Outlook
 \end{frame}
 
@@ -580,11 +599,12 @@
     \centering
     \begin{minipage}[c][.8\textheight][t]{\textwidth}
         \centering
-        \textsc{Level 3: Multi-GPU systems}\\[1em]
+        \textsc{Level 3: Multi-GPU / Multi-node}\\[1em]
         \scriptsize
         \mintinline{text}{CUDA.jl} composes with
         \mintinline{text}{DistributedArrays.jl}\\[1em]
 
+        \pause
         {\raggedright
         \mintinline{text}{DistributedArrays.jl}:
         Domain decomposition and distribution algorithms \\[1em]
@@ -595,7 +615,7 @@
         {\color{\MyBlue}Both understands Julias abstract concept of\\ an
         ``Array'', so they work together.}
 
-
+        \pause
         \vfill
         {\color{gray}{\em Rapid Software Prototyping for
         Heterogeneous and Distributed Platforms}\\ Besard
@@ -667,11 +687,48 @@
             {\em What niche does Julia even fill?}\\[2em]
         }%
         \only<2>{
-            If you {\em do understand} memory, you don't want it.
+            If you {\em don't understand} 
+            the compilation process, Julia is basically
+            unusable.
         }%
         \only<3>{
-            If you {\em don't understand} memory, you
-            basically can't use it!
+            \vspace*{\fill}
+            {\em Julia wont't replace lower-level languages.}
+            \vspace*{\fill}
+        }%
+        \only<4>{
+            \vspace*{\fill}
+            That being said...
+            \vspace*{\fill}
+        }%
+        \only<5>{
+            \vspace*{\fill}
+            \small {\em I quite like Julia}
+            \vspace*{\fill}
+        }%
+        \scriptsize
+        \only<6- >{
+            {\em What niche does Julia even fill?}\\[2em]
+        }%
+        \only<7- >{
+            \scriptsize
+            \vspace*{\fill}
+            Julia makes HPC a {\em first-class citizen} in the
+            ``\textsc{Matlab} workflow''\\[1em]
+        }%
+        \only<7>{\vspace*{\fill}}%
+        \only<8- >{
+            \begin{enumerate}
+                \item Interactive REPL/Notebook-based
+                    workflow
+                \item Good for {\em fucking around} with data
+                \item Sensible package manager
+                \item ``Math stuff'' is easily accessible
+            \end{enumerate}
+            \vspace{1em}
+            \includesvg[width=.1\textwidth]{jllogo}\\
+            \texttt{julialang.org}
+            \vspace*{\fill}
         }%
     \end{minipage}
 \end{frame}
