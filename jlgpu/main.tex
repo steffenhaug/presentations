@@ -574,7 +574,27 @@
 %%
 \begin{frame}
     \centering
-    \textsc{Level 3: Multi-GPU systems}
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+    \textsc{Pitfalls}\\[2em]
+
+    \scriptsize
+    \only<2>{
+        \mintinline{Julia}{CuArray} controls all memory transfer
+    }%
+    \only<3>{
+        Accidentally reading back to the CPU is really
+        painful!
+    }%
+    \end{minipage}
+\end{frame}
+
+
+%%
+\begin{frame}
+    \centering
+    \textsc{Level 3: Multi-GPU / Multi-node}\\[1em]
+    \scriptsize Future Outlook
 \end{frame}
 
 
@@ -583,11 +603,12 @@
     \centering
     \begin{minipage}[c][.8\textheight][t]{\textwidth}
         \centering
-        \textsc{Level 3: Multi-GPU systems}\\[1em]
+        \textsc{Level 3: Multi-GPU / Multi-node}\\[1em]
         \scriptsize
         \mintinline{text}{CUDA.jl} composes with
         \mintinline{text}{DistributedArrays.jl}\\[1em]
 
+        \pause
         {\raggedright
         \mintinline{text}{DistributedArrays.jl}:
         Domain decomposition and distribution algorithms \\[1em]
@@ -600,7 +621,7 @@
         \cite[6.3.2. Distributed GPU Arrays]{BESARD201929}
         .}
 
-
+        \pause
         \vfill
         {\color{gray}{\em Rapid Software Prototyping for
         Heterogeneous and Distributed Platforms}\\ Besard
@@ -612,17 +633,111 @@
 %%
 \begin{frame}
     \centering
-    \begin{itemize}
-        \item verdict: you cant escape location location
-            location
-        \item julia has real potential, but it is not a free
-            lunch
-        \item fighting the abstraction
-        \item what niche does julia even fill? if you
-            understand it you dont want it, and if you dont
-            understand it you can't use it
-    \end{itemize}
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+        \textsc{in summary}\\[1em]
+
+        \scriptsize
+        Julia makes bold claims%
+        \only<2>{: {\em ``Looks like Python -- runs like}
+        C/C++/Fortran''}%
+        \only<3- >{: {\em ``Only dynamic language to achieve
+        petascale''}}
+
+        \vspace{2em}
+        \only<4>{It is a truth with a \underline{big
+        asterisk}.}
+        \only<5->{
+            If there is {\em one thing} that is true, it is
+            that you can't escape\\[1em]
+            \small \textsc{Location, location, location}
+        }
+
+        \scriptsize
+        \vspace{2em}
+        \only<6>{
+            Julia has {\em real} potential, but it is
+            {\em not a free lunch!}\\
+            {\color{gray}(Especially on the GPU)}
+        }%
+        \only<7>{
+            I spend a lot of time ``fighting the
+            abstraction''
+        }%
+        \only<8->{
+            Allocation, garbage-collection, copies,
+            CUDA device$\leftrightarrow$host transfers,
+            etc.\\
+            are all {\em implicit!}\\[1em]
+        }%
+        \only<9>{
+            As Julia takes away your control, you have to be
+            careful.
+        }%
+        \only<10>{
+            {\color{\MyBlue} The abstraction leaks!}
+        }%
+    \end{minipage}
 \end{frame}
 
+
+%%
+\begin{frame}
+    \centering
+    \begin{minipage}[c][.8\textheight][t]{\textwidth}
+        \centering
+        \textsc{in summary}\\[1em]
+
+        \scriptsize
+        \only<1-3>{
+            {\em What niche does Julia even fill?}\\[2em]
+        }%
+        \only<2>{
+            If you {\em don't understand} 
+            the compilation process, Julia is basically
+            unusable.
+        }%
+        \only<3>{
+            \vspace*{\fill}
+            {\em Julia wont't replace lower-level languages.}
+            \vspace*{\fill}
+        }%
+        \only<4>{
+            \vspace*{\fill}
+            That being said...
+            \vspace*{\fill}
+        }%
+        \only<5>{
+            \vspace*{\fill}
+            \small {\em I quite like Julia}
+            \vspace*{\fill}
+        }%
+        \scriptsize
+        \only<6- >{
+            {\em What niche does Julia even fill?}\\[2em]
+        }%
+        \only<7- >{
+            \scriptsize
+            \vspace*{\fill}
+            Julia makes HPC a {\em first-class citizen} in the
+            ``\textsc{Matlab} workflow''\\[1em]
+        }%
+        \only<7>{\vspace*{\fill}}%
+        \only<8- >{
+            \begin{enumerate}
+                \item Interactive REPL/Notebook-based
+                    workflow
+                \item Good for {\em fucking around} with data
+                \item Sensible package manager
+                \item ``Math stuff'' is easily accessible
+                \item {\bf Visualization is made easy}
+            \end{enumerate}
+            \vspace{1em}
+            \includesvg[width=.1\textwidth]{jllogo}\\
+            \texttt{julialang.org}
+            \vspace*{\fill}
+        }%
+    \end{minipage}
+\end{frame}
 
 \end{document}
