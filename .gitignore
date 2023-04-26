@@ -7,3 +7,5 @@
 *.vrb
 _minted-main/
 svg-inkscape/
+*.bcf
+*.run.xml

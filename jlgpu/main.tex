@@ -1,5 +1,9 @@
 \PassOptionsToPackage{dvipsnames}{xcolor}
 \documentclass[14pt]{beamer}
+
+\usepackage{biblatex}
+\addbibresource{citations.bib}
+
 \usepackage[]{xcolor}
 \def\MyGreen{ForestGreen}
 \def\MyRed{Red}
@@ -592,7 +596,9 @@
         }
 
         {\color{\MyBlue}Both understands Julias abstract concept of\\ an
-        ``Array'', so they work together.}
+        ``Array'', so they work together
+        \cite[6.3.2. Distributed GPU Arrays]{BESARD201929}
+        .}
 
 
         \vfill
