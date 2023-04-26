@@ -1,7 +1,7 @@
 \PassOptionsToPackage{dvipsnames}{xcolor}
 \documentclass[14pt]{beamer}
 
-\usepackage{biblatex}
+\usepackage[style=verbose,backend=biber]{biblatex}
 \addbibresource{citations.bib}
 
 \usepackage[]{xcolor}
@@ -601,32 +601,21 @@
 %%
 \begin{frame}
     \centering
-    \begin{minipage}[c][.8\textheight][t]{\textwidth}
-        \centering
-        \textsc{Level 3: Multi-GPU / Multi-node}\\[1em]
-        \scriptsize
-        \mintinline{text}{CUDA.jl} composes with
-        \mintinline{text}{DistributedArrays.jl}\\[1em]
+    \textsc{Level 3: Multi-GPU / Multi-node}\\[1em]
+    \scriptsize
+    \mintinline{text}{CUDA.jl} composes with
+    \mintinline{text}{DistributedArrays.jl}\\[1em]
 
-        \pause
-        {\raggedright
-        \mintinline{text}{DistributedArrays.jl}:
-        Domain decomposition and distribution algorithms \\[1em]
-        \mintinline{text}{CUDA.jl}: Manages device-side
-        buffers and host-device communication\\[3em]
-        }
+    {\raggedright
+    \mintinline{text}{DistributedArrays.jl}:
+    Domain decomposition and distribution algorithms \\[1em]
+    \mintinline{text}{CUDA.jl}: Manages device-side
+    buffers and host-device communication\\[3em]
+    }
 
-        {\color{\MyBlue}Both understands Julias abstract concept of\\ an
-        ``Array'', so they work together
-        \cite[6.3.2. Distributed GPU Arrays]{BESARD201929}
-        .}
-
-        \pause
-        \vfill
-        {\color{gray}{\em Rapid Software Prototyping for
-        Heterogeneous and Distributed Platforms}\\ Besard
-        et. al.}
-    \end{minipage}
+    {\color{\MyBlue}Both understands Julias abstract concept of\\ an
+    ``Array'', so they work together.}
+    \footcite[(Section 6.3.2. Distributed GPU Arrays)]{BESARD201929}
 \end{frame}
 
 
@@ -739,5 +728,10 @@
         }%
     \end{minipage}
 \end{frame}
+
+%%
+\begin{frame}
+    \printbibliography
+\end{frame} 
 
 \end{document}

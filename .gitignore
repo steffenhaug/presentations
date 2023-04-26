@@ -9,3 +9,6 @@ _minted-main/
 svg-inkscape/
 *.bcf
 *.run.xml
+*.bbl
+*.blg
+
